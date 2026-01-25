@@ -28,8 +28,8 @@ D<sub>t</sub> represents the drainage of the soil, where the surface will be rep
 $$
 D_t =
 \begin{cases}
-k \cdot (S_t - SFC) & \text{if } S_t > SFC,\\\\[4pt]
-0 & \text{if } S_t \le SFC
+k \cdot (S_t - SFC) & \text{if } S_t > S_{FC},\\\\[4pt]
+0 & \text{if } S_t \le S_{FC}
 \end{cases}
 $$
 
