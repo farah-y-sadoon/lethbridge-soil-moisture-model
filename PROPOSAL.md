@@ -6,7 +6,7 @@ The Canadian Prairies are a vital ecoregion for the country, and hydrological ch
 
 In particular, Lethbridge, Alberta is an area of interest because it lies within Palliser’s Triangle, a semi-arid region historically seen as unsuitable for agriculture. However, this area is now a critical location for Canada’s agricultural sector due to irrigation practices (Lemmen et al., 1998). The intersection of climatic change and water management strategies makes Lethbridge an ideal location for modelling soil moisture dynamics and assessing how these interacting forces impact agricultural potential and ecosystem resilience.
 
-The goal of this project is to use the Government of Alberta’s Soil Group Map (2015) and the Alberta Climate Services (ACIS) database to obtain soil texture and meteorological data from the Lethbridge weather station, in order to model daily soil moisture trends over time (Government of Aberta, 2026).
+The goal of this project is to use the Government of Alberta’s Soil Group Map (2015) and the Alberta Climate Services (ACIS) database to obtain soil texture and meteorological data from the Lethbridge weather station, in order to model daily soil moisture trends over time (Government of Alberta, 2026).
 
 ## Model Description
 
