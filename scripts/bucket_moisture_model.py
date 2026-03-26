@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import glob
 import pvlib
+import matplotlib
+import matplotlib.pyplot as plt
 
 def main(): 
     try:
@@ -58,7 +60,7 @@ def main():
         df_weather['date'] = pd.to_datetime(df_weather['date'], dayfirst = True)
         df_weather = df_weather.sort_values(by = 'date')
         df_weather = df_weather.set_index('date')
-        df_weather = df_weather[~df_weather.index.duplicated(keep='first')]
+        df_weather = df_weather[~df_weather.index.duplicated(keep = 'first')] # only keep the first instance of the date if there are duplicates
 
         # CALCULATE extraterrestrial radiation
         times = df_weather.index # extract date values for equation
@@ -74,7 +76,7 @@ def main():
         
         # CALCULATE cloud cover correction 
         rainy_days = df_weather['precip'] > 0.0 
-        cloud_shadow = rainy_days.rolling(window = cloud_cover_days + 1, min_periods = 1).max().astype(bool)
+        cloud_shadow = rainy_days.rolling(window = cloud_cover_days, min_periods = 1).max().astype(bool)
         
         # Apply the correction
         df_weather['cloud_correction'] = np.where(cloud_shadow, cloud_reduction_factor, 1.0)
@@ -112,8 +114,91 @@ def main():
              
             # Update provisional to point to current day's storage value for tomorrow's calculation
             S_current = S_final
+        
+        # Save results
+        output_csv = os.path.join(output_directory, 'soil_moisture_results.csv')
+        df_weather.to_csv(output_csv, index = True)
 
-        df_weather.to_csv(os.path.join(output_directory, '/df_weather_results.csv'), index = False)
+        # CREATE plots
+        # 1 - Average soil moisture for day of year
+        # Create column for day of year and calculate average for each day of the year
+        df_weather['doy'] = df_weather.index.day_of_year
+        df_doy_average = df_weather.groupby('doy').mean() # group all the same days together and calculate mean in a new dataframe
+
+        # Create labels for each month to make chart more readable
+        month_ticks = df_weather.groupby(df_weather.index.month)['doy'].min()
+
+        # Extract maximum and minimum years for title 
+        min_year = df_weather.index.year.min()
+        max_year = df_weather.index.year.max() 
+
+        # Generate plot
+        plt.plot(df_doy_average.index, df_doy_average['St'])
+        plt.xticks(month_ticks.values, ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+
+        # Add a plot title
+        plt.title(f'Average Daily Soil Moisture {min_year} - {max_year}', fontsize = 15)
+
+        # Add axis labels
+        plt.ylabel('Soil Moisture (mm)', fontsize = 15)
+
+        # Rotate axis ticks
+        plt.xticks(rotation = 30, fontsize = 15)
+
+        # Save plot
+        output_plot = os.path.join(output_directory, 'avg_doy_soil_moisture.png')
+        plt.savefig(output_plot, dpi = 900, bbox_inches = "tight")
+    
+        # Show plot
+        plt.show()
+
+        # 2 - Seasonal statistics boxplots
+        # Add a column to data frame for each season
+        conditions  = [df_weather.index.month.isin([12,1,2]), df_weather.index.month.isin([3,4,5]), 
+                       df_weather.index.month.isin([6,7,8]), df_weather.index.month.isin([9,10,11])]
+        choices     = [ 'Winter', 'Spring', 'Summer', 'Autumn' ]
+                    
+        df_weather['season'] = np.select(conditions, choices, default = "NA")
+        df_weather['year'] = df_weather.index.year
+        df_weather['month'] = df_weather.index.month_name()
+
+        # Calculate seasonal averages for each year and month 
+        df_seasonal_average = df_weather.groupby(['season', 'year'])['St'].mean()
+
+        # Extract each season as an array to plot as boxplots
+        season_labels = ['Winter (Dec-Feb)', 'Spring (Mar-May)', 'Summer (Jun-Aug)', 'Autumn (Sep-Nov)']
+        colors = ['#4EA8DE', '#57CC99', '#FFD166', '#F4845F']
+
+        winter = df_seasonal_average.loc['Winter'].values # loc indicates specific columns in pandas that belong to each array
+        spring = df_seasonal_average.loc['Spring'].values
+        summer = df_seasonal_average.loc['Summer'].values
+        autumn = df_seasonal_average.loc['Autumn'].values
+        data_arrays   = [winter, spring, summer, autumn]
+
+        # Generate plot
+        fig, ax = plt.subplots()
+        ax.set_ylabel('Soil Moisture (mm)')
+
+        bplot = ax.boxplot(data_arrays, patch_artist = True, # fill with color
+                        tick_labels = season_labels)  # will be used to label x-ticks
+
+        # Fill with specified colours
+        for patch, color in zip(bplot['boxes'], colors):
+            patch.set_facecolor(color)
+
+        # Add a plot title
+        plt.title(f'Soil Moisture by Season {min_year} - {max_year}', fontsize = 15)
+
+        # Rotate axis ticks
+        plt.xticks(rotation = 30, fontsize = 15)
+        plt.yticks(fontsize = 15)
+
+        # Save plot
+        output_plot = os.path.join(output_directory, 'seasonal_soil_moisture_boxplots.png')
+        plt.savefig(output_plot, dpi = 900, bbox_inches = "tight")
+    
+        # Show plot
+        plt.show()
 
     except Exception as e: 
         print(f"An error occurred: {e}")
@@ -124,19 +209,8 @@ def main():
 main()
 
 # NEXT STEPS
-# MAKE INPUTS PARAMS ALL USER SPECIFIED
+# CREATE GUI WITH USER SPECIFIED PARAMS
     # FIELD CAPACITY
     # ROOT ZONE DEPTH
     # DRAINAGE COEFF
-
-# SAVE OUTPUT
-# CREATE VISUALIZATIONS FROM OUTPUTS
-
-### EXTRA: TO MAKE THIS OBJECT ORIENTED
-            # METHOD 1 - CALCULATE DRAINAGE
-            # METHOD 2 - CALCULATE EVAPOTRANSPIRATION
-            # METHOD 3 - CALCULATE FINAL MODEL OUTPUT VALUES - STORAGE (MM)
-                # OUTPUT FIGURES
-
-### EXTRA: SET PROGRESS UPDATES FOR THE USER
 
