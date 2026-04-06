@@ -29,46 +29,28 @@ The climate records used for developing this model were obtained from the Albert
 ### 3.1 Model Description
 The model is a 0D bucket model of soil moisture based on the mass balance equation described by Rodriguez-Iturbe et al. (1999). It is a simplified, physically-based model that takes the specified climate data (Table 1) and estimates evapotranspiration and drainage processes to determine soil moisture trends over time (Equation 1, Figure 2). As the input data represents daily air temperature and precipitation as aggregates from the Lethbridge weather station, the model is only representative of the area surrounding the weather station itself. Additionally, this model does not take into consideration lateral movement of water through soil, and so will estimate general trends of soil moisture rather than being spatially precise.
 
-$$S_{t+1} &= S_t + P_t - ET_t - D_t$$
+(1) $$S_{t+1} = S_t + P_t - ET_t - D_t$$
+
 
 St represents soil water storage at one day in mm. The initial value of St is estimated as 50% of field capacity, representing a reasonable starting point for soil moisture where the substrate is neither completely dry nor saturated. Pt represents the total precipitation and Et represents the evapotranspiration for that day, respectively. Et is calculated using Hargreaves’ equation, (Equation 2, Hargreaves & Samani, 1982), where the factor 0.408 was used to convert from MJ/m² to mm of evaporation. Solar radiation (Ra) is calculated with pvlib.irradiance.get_extra_radiation, estimated from the day of the year for each record (version 0.15.0 Anderson et al., 2024).
 
-$$
-\begin{align}
-ET_0 &= 0.0023 \cdot (T_{mean} + 17.8) \cdot (T_{max} - T_{min}) \cdot R_a \tag{2} \\[6pt]
-\end{align} 
-$$
+(2) $$ET_0 = 0.0023 \cdot (T_{mean} + 17.8) \cdot (T_{max} - T_{min}) \cdot R_a $$
 
 ET₀ is further adjusted to account for cloud cover and water stress. ET₀ is reduced on days with precipitation and the N days preceding them to account for reduced solar radiation under cloud cover (Equation 3), where Fcloud is the user-specified cloud reduction factor applied within the cloud cover window, and 1.0 otherwise. The default value of Fcloud is 0.5, representing a conservative reduction in solar radiation during cloudy periods. The default value for cloud cover window is set to 3, based on climate normals data that suggest precipitation events are typically 2 to 3 days apart during the growing season in Lethbridge (Environment and Climate Change Canada, 2026). Furthermore, when soil storage falls below 50% of field capacity, ET is scaled proportionally to reflect reduced plant water availability (Equation 4, Equation 5).
 
-$$
-\begin{align}
-ET_{corrected} &= ET_0 \cdot F_{cloud} \tag{3} \\[6pt]
-\end{align}
-$$
+(3) $$ET_{corrected} = ET_0 \cdot F_{cloud}$$
 
-$$ 
-\begin{align}
-Stress &= \min\!\left(1,\ \frac{S_t}{0.5 \cdot S_{FC}}\right) \tag{4} \\[6pt]
-ET_{Stress} &= ET_{corrected} \cdot Stress \tag{5} \\[6pt]
-\end{align}
-$$
+(4) $$ Stress = \min\!\left(1,\ \frac{S_t}{0.5 \cdot S_{FC}}\right)$$
+
+(5) $$ET_{Stress} = ET_{corrected} \cdot Stress$$
 
 Dt represents soil drainage, where the surface is represented as having a fixed capacity for holding water (Manabe, 1969). Dt is outlined in Equation 6, where SFC represents field capacity or the maximum capacity for water at the site and k is the drainage coefficient determined by soil texture.
 
-$$
-\begin{align}
-D_t &= \begin{cases} k \cdot (S_t - S_{FC}) & \text{if } S_t > S_{FC} \\ 0 & \text{if } S_t \leq S_{FC} \end{cases} \tag{6} \\[6pt]
-\end{align}
-$$
+(6) $$D_t = \begin{cases} k \cdot (S_t - S_{FC}) & \text{if } S_t > S_{FC} \\ 0 & \text{if } S_t \leq S_{FC} \end{cases} $$
 
 Finally, SFC  is a constant inferred by multiplying the soil texture by the root zone depth (Z). Since St is reported in mm, the model requires the user to report Z in the same units (Equation 7). The default value of field capacity (𝛳FC), was estimated using soil texture as an intermediate parameter that is not explicitly modeled. Soil texture for the Lethbridge area was obtained from the Alberta Soil Information Viewer (Government of Alberta, 2016), and the corresponding 𝛳FC for the Lethbridge area was then derived based on Saxton and Rawls’ estimates of water characteristic values for texture classes at 2.5%w organic matter (2006). The default value of Z was set to 1000 mm, representing the typical root zone depth for crops grown in Lethbridge (Fan et al., 2016).
 
-$$
-\begin{align}
-S_{FC} &= FC \cdot Z \tag{7}
-\end{align}
-$$
+(7) $$S_{FC} = FC \cdot Z$$
 
 The model produces daily estimates of soil water storage (mm) over the period of record, capturing the effects of precipitation, evapotranspiration, and drainage on soil moisture dynamics. These estimates are summarized as average trends and seasonal distributions, providing insight into how soil moisture varies across and between seasons at the site.
 
