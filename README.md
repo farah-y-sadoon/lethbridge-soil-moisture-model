@@ -29,11 +29,7 @@ The climate records used for developing this model were obtained from the Albert
 ### 3.1 Model Description
 The model is a 0D bucket model of soil moisture based on the mass balance equation described by Rodriguez-Iturbe et al. (1999). It is a simplified, physically-based model that takes the specified climate data (Table 1) and estimates evapotranspiration and drainage processes to determine soil moisture trends over time (Equation 1, Figure 2). As the input data represents daily air temperature and precipitation as aggregates from the Lethbridge weather station, the model is only representative of the area surrounding the weather station itself. Additionally, this model does not take into consideration lateral movement of water through soil, and so will estimate general trends of soil moisture rather than being spatially precise.
 
-$$
-\begin{align}
-S_{t+1} &= S_t + P_t - ET_t - D_t \tag{1} \\[6pt]
-\end{align} 
-$$
+$$S_{t+1} &= S_t + P_t - ET_t - D_t$$
 
 St represents soil water storage at one day in mm. The initial value of St is estimated as 50% of field capacity, representing a reasonable starting point for soil moisture where the substrate is neither completely dry nor saturated. Pt represents the total precipitation and Et represents the evapotranspiration for that day, respectively. Et is calculated using Hargreaves’ equation, (Equation 2, Hargreaves & Samani, 1982), where the factor 0.408 was used to convert from MJ/m² to mm of evaporation. Solar radiation (Ra) is calculated with pvlib.irradiance.get_extra_radiation, estimated from the day of the year for each record (version 0.15.0 Anderson et al., 2024).
 
