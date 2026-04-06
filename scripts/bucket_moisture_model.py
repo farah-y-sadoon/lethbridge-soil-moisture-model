@@ -243,7 +243,7 @@ class Window(tk.Frame):
             df_weather['St'] = 0.0
 
             for i, row in df_weather.iterrows():
-                # CALCULATE stress_ET to scale ET by available water - when storage falls below 50% of field capacity, ET decreases; accounts for root activity
+                # CALCULATE stress_ET to scale ET by available water - when storage falls below 50% of storage capacity, ET decreases; accounts for root activity
                 stress = min(1.0, S_current / (0.5 * capacity_mm))  # ET starts declining below 50% capacity
                 stress_ET = row['ET0'] * stress
 
