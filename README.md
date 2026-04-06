@@ -40,13 +40,14 @@ ET₀ is further adjusted to account for cloud cover and water stress. ET₀ is 
 
 (3) $$ET_{corrected} = ET_0 \cdot F_{cloud}$$
 
-(4) $$ Stress = \min\!\left(1,\ \frac{S_t}{0.5 \cdot S_{FC}}\right)$$
+(4) $$Stress = \min(1, S_t / (0.5 \cdot S_{FC}))$$
 
 (5) $$ET_{Stress} = ET_{corrected} \cdot Stress$$
 
 Dt represents soil drainage, where the surface is represented as having a fixed capacity for holding water (Manabe, 1969). Dt is outlined in Equation 6, where SFC represents field capacity or the maximum capacity for water at the site and k is the drainage coefficient determined by soil texture.
 
-(6) $$D_t = \begin{cases} k \cdot (S_t - S_{FC}) & \text{if } S_t > S_{FC} \\ 0 & \text{if } S_t \leq S_{FC} \end{cases} $$
+(6) $$D_t = k \cdot (S_t - S_{FC}) \text{ if } S_t > S_{FC}$$
+$$D_t = 0 \text{ if } S_t \leq S_{FC}$$
 
 Finally, SFC  is a constant inferred by multiplying the soil texture by the root zone depth (Z). Since St is reported in mm, the model requires the user to report Z in the same units (Equation 7). The default value of field capacity (𝛳FC), was estimated using soil texture as an intermediate parameter that is not explicitly modeled. Soil texture for the Lethbridge area was obtained from the Alberta Soil Information Viewer (Government of Alberta, 2016), and the corresponding 𝛳FC for the Lethbridge area was then derived based on Saxton and Rawls’ estimates of water characteristic values for texture classes at 2.5%w organic matter (2006). The default value of Z was set to 1000 mm, representing the typical root zone depth for crops grown in Lethbridge (Fan et al., 2016).
 
