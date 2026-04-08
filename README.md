@@ -9,7 +9,7 @@ Ideally, soil moisture trends would be determined from direct sampling; however,
 The objectives of this study are to develop a process-based model that estimates daily soil moisture from historical climate data, and to apply it to Lethbridge, AB over a 12-year period to characterize regional soil moisture trends in the Canadian Prairies.
 
 ## 2.0 Input Data
-The model accepts climate data in comma-separated values (CSV) format, where required fields are described in Table 1.  
+The model accepts climate data in comma-separated values (CSV) format, where required fields are described in Table 1. In addition to having the appropriate columns and date values, the model expects that any missing values be imputed or removed prior to running.
 
 **Table 1.** Required input fields for the soil moisture model, with expected format and units.
 | Field | Description | Format or Unit |
